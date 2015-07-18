@@ -1,0 +1,7 @@
+<?php
+return [
+    [
+        "patch" => "Select * From patch WHERE id = 0",
+        "rollBack" => "Select * From patche WHERE id = 0"
+    ],
+];
