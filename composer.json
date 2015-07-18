@@ -1,0 +1,29 @@
+{
+  "name": "GreatOwl/Patches",
+  "description": "A tool for patching databases reliably",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Andrew Nowak",
+      "email": "andrew@nowakfamily.net"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "ext-PDO": "*",
+    "league/flysystem" : "~1.0"
+  },
+  "require-dev": {
+    "symfony/Yaml": "v2.7.2",
+    "phpunit/phpunit": "4.*",
+    "phpunit/php-invoker": "*",
+    "phpmd/phpmd": ">=1.4",
+    "squizlabs/php_codesniffer": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "GreatOwl\\Patches\\": "src"
+    }
+  }
+}
