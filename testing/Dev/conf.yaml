@@ -5,4 +5,4 @@ database:
   username: dbuser
   password: 123
 
-directory: "Database"
+directory: "Database/"

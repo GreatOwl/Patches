@@ -1,0 +1,6 @@
+[
+    {
+        "query": "ALTER TABLE patch DROP COLUMN rollback_status",
+        "rollBack": "ALTER TABLE patch ADD COLUMN rollback_status"
+    }
+]

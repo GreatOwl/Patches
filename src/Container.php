@@ -1,5 +1,4 @@
 <?php
-
 namespace GreatOwl\Patches;
 
 
@@ -76,5 +75,10 @@ class Container
         }
 
         return false;
+    }
+
+    public function dump()
+    {
+        return $this->data;
     }
 }

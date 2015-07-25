@@ -1,75 +1,48 @@
 <?php
+namespace GreatOwl\Patches\Models\Patch;
 
-namespace GreatOwl\Patches\Model\Patch;
 
-
-use GreatOwl\Patches\Connect;
 use GreatOwl\Patches\Container;
-use PDO;
 
 class Patch
 {
-    const INSTALL = "Install/patch.sql";
-    const PATCH = "Patches/patch.phpd";
-    const TABLE = "patches";
-
-    /**
-     * @var PDO $connection
-     */
-    private $connection;
-
     /**
      * @var array $parameters
      */
     private $parameters;
 
     /**
-     * @var int $id
-     */
-    private $id;
-
-    /**
-     * @param Connect $connect
      * @param array $raw
      */
-    public function __construct(Connect $connect, $raw = [])
+    public function __construct($raw = [])
     {
-        $this->connection = $connect->getConnection();
+        $this->validateParameters($raw, ['table','patch', 'query']);
         $this->parameters = new Container($raw);
     }
 
-    public function getId()
+    public function getId($default = null)
     {
-        //this may not be best... revisit
-        if (is_null($this->id)) {
-            $statement = $this->connection->prepare("Select id from patches WHERE table = :table AND patch = :patch");
-            $statement->bindParam(':table', $this->getTable());
-            $statement->bindParam(':patch', $this->getPatch());
-            $statement->execute();
-            $this->id = $statement->fetch();
-        }
-
-        return $this->id;
+        return $this->parameters->get('id', $default);
     }
 
-    public function getTable()
+    public function getTable($default = null)
     {
-        return $this->parameters->get('table');
+        return $this->parameters->get('table', $default);
     }
 
-    public function getPatch()
+    public function getPatch($default = null)
     {
-        return $this->parameters->get('patch');
+        return $this->parameters->get('patch', $default);
     }
 
-    public function getQuery()
+    public function getQuery($default = '')
     {
-        return $this->parameters->get('query');
+        return $this->parameters->get('query', $default);
     }
 
-    public function getStatus()
+    public function getStatus($default = false)
     {
-        return $this->parameters->get('status');
+        return $this->parameters->get('status', $default);
     }
 
     public function setStatus($status)
@@ -77,9 +50,38 @@ class Patch
         $this->parameters->set('status', $status);
     }
 
-    public function save()
+    public function getRollback($default = '', $default)
     {
+        return $this->parameters->get('rollback', $default);
+    }
 
+    public function getRollbackStatus($default = null)
+    {
+        return $this->parameters->get('rollback_status', $default);
+    }
+
+    public function setRollbackStatus($status)
+    {
+        $this->parameters->set('rollback_status', $status);
+    }
+
+    public function getChanges()
+    {
+        return $this->parameters->changes();
+    }
+
+    public function dump()
+    {
+        return $this->parameters->dump();
+    }
+
+    private function validateParameters(array $raw, array $requiredParams = [])
+    {
+        foreach ($requiredParams as $param) {
+            if (!array_key_exists($param, $raw)) {
+                throw new \InvalidArgumentException($param . ' is a required parameter.');
+            }
+        }
     }
 
 }
