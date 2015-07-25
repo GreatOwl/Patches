@@ -1,6 +1,7 @@
+#!/usr/bin/env php
 <?php
 
-use GreatOwl\Patches\Models\Service\Database\Connection;
+use GreatOwl\Patches\Service\Database\Connection;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
@@ -27,11 +28,13 @@ $connection = new Connection(
     $database['name']
 );
 
-$query = new \GreatOwl\Patches\Models\Service\Database\Query($connection);
-$map = new \GreatOwl\Patches\Models\Patch\Map($query, $fileSystem, $dbDir);
-$factory = new \GreatOwl\Patches\Models\Patch\Factory();
-$repository = new \GreatOwl\Patches\Models\Patch\Repository($map, $factory);
-$worker = new \GreatOwl\Patches\Worker($repository, $query, $map);
+$query = new \GreatOwl\Patches\Service\Database\Query($connection);
+$fileHandle = new \GreatOwl\Patches\Service\File\Handle($fileSystem, $dbDir);
+$dbMap = new \GreatOwl\Patches\Patch\Model\Service\Database\MySqlMap($query);
+$fileMap = new \GreatOwl\Patches\Patch\Model\Service\File\FileMap($fileSystem, $dbDir);
+$factory = new \GreatOwl\Patches\Patch\Factory();
+$repository = new \GreatOwl\Patches\Patch\Repository($dbMap, $fileMap, $factory);
+$worker = new \GreatOwl\Patches\Worker($repository, $query, $fileHandle, $dbMap, $fileMap);
 
-var_dump($worker->patchAll());
+$worker->patchAll();
 

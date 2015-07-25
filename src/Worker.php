@@ -2,23 +2,29 @@
 namespace GreatOwl\Patches;
 
 
-use GreatOwl\Patches\Models\Patch\Map;
-use GreatOwl\Patches\Models\Patch\Patch;
-use GreatOwl\Patches\Models\Patch\Repository;
-use GreatOwl\Patches\Models\Service\Database\Query;
+use GreatOwl\Patches\Patch\Model\Service\Map;
+use GreatOwl\Patches\Patch\Model\Service\File\FileMap;
+use GreatOwl\Patches\Patch\Model\Patch;
+use GreatOwl\Patches\Patch\Repository;
+use GreatOwl\Patches\Service\Database\Query;
+use GreatOwl\Patches\Service\File\Handle;
 
 class Worker
 {
 
     private $repository;
     private $query;
-    private $patchMap;
+    private $fileHandle;
+    private $dbMap;
+    private $fileMap;
 
-    public function __construct(Repository $repository, Query $query, Map $patchMap)
+    public function __construct(Repository $repository, Query $query, Handle $fileHandle, Map $dbMap, FileMap $fileMap)
     {
         $this->repository = $repository;
         $this->query = $query;
-        $this->patchMap = $patchMap;
+        $this->fileHandle = $fileHandle;
+        $this->dbMap = $dbMap;
+        $this->fileMap = $fileMap;
     }
 
     public function patchTable($table)
@@ -32,18 +38,16 @@ class Worker
         foreach ($unPatched as $patch) {
             $error = $this->query->patch($patch->getQuery());
             if (is_null($error[2])) {
-                $patch->setStatus(true);
-            } else {
-                $patch->setStatus(false);
+                $this->dbMap->applyPatch($patch);
+                $this->fileMap->applyPatch($patch);
             }
-            $this->patchMap->applyPatch($patch);
         }
 
     }
 
     public function patchAll()
     {
-        $patchFiles = $this->patchMap->getAllPatchFiles();
+        $patchFiles = $this->fileHandle->getAllFilesInDir('Patches/');
         foreach ($patchFiles as $patchFile) {
             $this->patchTable($patchFile);
         }
