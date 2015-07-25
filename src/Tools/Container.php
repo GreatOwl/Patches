@@ -1,5 +1,5 @@
 <?php
-namespace GreatOwl\Patches;
+namespace GreatOwl\Patches\Tools;
 
 
 class Container

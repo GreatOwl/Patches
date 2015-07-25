@@ -1,7 +1,7 @@
 <?php
 namespace GreatOwl\Patches\Patch\Model;
 
-use GreatOwl\Patches\Container;
+use GreatOwl\Patches\Tools\Container;
 
 class Patch
 {

@@ -34,7 +34,7 @@ $dbMap = new \GreatOwl\Patches\Patch\Model\Service\Database\MySqlMap($query);
 $fileMap = new \GreatOwl\Patches\Patch\Model\Service\File\FileMap($fileSystem, $dbDir);
 $factory = new \GreatOwl\Patches\Patch\Factory();
 $repository = new \GreatOwl\Patches\Patch\Repository($dbMap, $fileMap, $factory);
-$worker = new \GreatOwl\Patches\Worker($repository, $query, $fileHandle, $dbMap, $fileMap);
+$worker = new \GreatOwl\Patches\Patch\Controller($repository, $query, $fileHandle, $dbMap, $fileMap);
 
 $worker->patchAll();
 

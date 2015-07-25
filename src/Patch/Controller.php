@@ -1,15 +1,14 @@
 <?php
-namespace GreatOwl\Patches;
+namespace GreatOwl\Patches\Patch;
 
 
 use GreatOwl\Patches\Patch\Model\Service\Map;
 use GreatOwl\Patches\Patch\Model\Service\File\FileMap;
 use GreatOwl\Patches\Patch\Model\Patch;
-use GreatOwl\Patches\Patch\Repository;
 use GreatOwl\Patches\Service\Database\Query;
 use GreatOwl\Patches\Service\File\Handle;
 
-class Worker
+class Controller
 {
 
     private $repository;
