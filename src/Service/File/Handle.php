@@ -1,5 +1,5 @@
 <?php
-namespace GreatOwl\Patches\Service\File;
+namespace TallTree\Roots\Service\File;
 
 use League\Flysystem\Filesystem;
 

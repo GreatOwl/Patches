@@ -1,5 +1,5 @@
 <?php
-namespace GreatOwl\Patches\Service\Database;
+namespace TallTree\Roots\Service\Database;
 
 use PDO;
 

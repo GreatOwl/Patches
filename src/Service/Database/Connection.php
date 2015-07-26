@@ -1,5 +1,5 @@
 <?php
-namespace GreatOwl\Patches\Service\Database;
+namespace TallTree\Roots\Service\Database;
 
 use PDO;
 use PDOException;
@@ -9,6 +9,10 @@ class Connection
     const PDO_DSN_DATABASE = "%s:dbname=%s;host=%s";
     const PDO_DSN_NO_DATABASE = "%s:host=%s";
 
+    /**
+     * @var PdoFactory $pdoFactory
+     */
+    private $pdoFactory;
     private $type;
     private $server;
     private $username;
@@ -28,12 +32,14 @@ class Connection
     private $errors = [];
 
     public function __construct(
+        PdoFactory $pdoFactory,
         $type,
         $server,
         $username,
         $password,
         $name = null
     ) {
+        $this->pdoFactory = $pdoFactory;
         $this->type = $type;
         $this->server = $server;
         $this->username = $username;
@@ -79,7 +85,7 @@ class Connection
     {
         $dsn = sprintf(static::PDO_DSN_DATABASE, $this->type, $this->name, $this->server);
         try {
-            $connection = new PDO($dsn, $this->username, $this->password);
+            $connection = $this->pdoFactory->createPDO($dsn, $this->username, $this->password);//new PDO($dsn, $this->username, $this->password);
             $this->isConnectedToDB = true;
             return $connection;
         } catch (PDOException $error) {
@@ -93,7 +99,7 @@ class Connection
     {
         $dsn = sprintf(static::PDO_DSN_NO_DATABASE, $this->type, $this->server);
         try {
-            $connection = new PDO($dsn, $this->username, $this->password);
+            $connection = $this->pdoFactory->createPDO($dsn, $this->username, $this->password);//new PDO($dsn, $this->username, $this->password);
             $connection = $this->attemptToCreateDatabase($connection);
             return $connection;
         } catch (PDOException $error) {

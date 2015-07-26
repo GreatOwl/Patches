@@ -1,8 +1,8 @@
 <?php
-namespace GreatOwl\Patches\Patch;
+namespace TallTree\Roots\Patch;
 
-use GreatOwl\Patches\Patch\Model\Patch;
-use GreatOwl\Patches\Patch\Model\Collection;
+use TallTree\Roots\Patch\Model\Patch;
+use TallTree\Roots\Patch\Model\Collection;
 
 class Factory
 {

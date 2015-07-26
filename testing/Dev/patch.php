@@ -1,7 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-use GreatOwl\Patches\Service\Database\Connection;
+use TallTree\Roots\Service\Database\Connection;
+use TallTree\Roots\Service\Database\PdoFactory;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
@@ -21,6 +22,7 @@ $database = $configuration['database'];
 $dbDir = $configuration['directory'];
 
 $connection = new Connection(
+    new PdoFactory(),
     $database['type'],
     $database['server'],
     $database['username'],
@@ -28,13 +30,13 @@ $connection = new Connection(
     $database['name']
 );
 
-$query = new \GreatOwl\Patches\Service\Database\Query($connection);
-$fileHandle = new \GreatOwl\Patches\Service\File\Handle($fileSystem, $dbDir);
-$dbMap = new \GreatOwl\Patches\Patch\Model\Service\Database\MySqlMap($query);
-$fileMap = new \GreatOwl\Patches\Patch\Model\Service\File\FileMap($fileSystem, $dbDir);
-$factory = new \GreatOwl\Patches\Patch\Factory();
-$repository = new \GreatOwl\Patches\Patch\Repository($dbMap, $fileMap, $factory);
-$worker = new \GreatOwl\Patches\Patch\Controller($repository, $query, $fileHandle, $dbMap, $fileMap);
+$query = new \TallTree\Roots\Service\Database\Query($connection);
+$fileHandle = new \TallTree\Roots\Service\File\Handle($fileSystem, $dbDir);
+$dbMap = new \TallTree\Roots\Patch\Model\Service\Database\MySqlMap($query);
+$fileMap = new \TallTree\Roots\Patch\Model\Service\File\FileMap($fileSystem, $dbDir);
+$factory = new \TallTree\Roots\Patch\Factory();
+$repository = new \TallTree\Roots\Patch\Repository($dbMap, $fileMap, $factory);
+$worker = new \TallTree\Roots\Patch\Controller($repository, $query, $fileHandle, $dbMap, $fileMap);
 
 $worker->patchAll();
 

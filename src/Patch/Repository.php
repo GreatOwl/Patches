@@ -1,8 +1,8 @@
 <?php
-namespace GreatOwl\Patches\Patch;
+namespace TallTree\Roots\Patch;
 
-use GreatOwl\Patches\Patch\Model\Collection;
-use GreatOwl\Patches\Patch\Model\Service\Map;
+use TallTree\Roots\Patch\Model\Collection;
+use TallTree\Roots\Patch\Model\Service\Map;
 
 class Repository
 {

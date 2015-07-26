@@ -1,9 +1,9 @@
 <?php
-namespace GreatOwl\Patches\Patch\Model\Service\File;
+namespace TallTree\Roots\Patch\Model\Service\File;
 
 use League\Flysystem\Filesystem;
-use GreatOwl\Patches\Patch\Model\Service\Map;
-use GreatOwl\Patches\Patch\Model\Patch;
+use TallTree\Roots\Patch\Model\Service\Map;
+use TallTree\Roots\Patch\Model\Patch;
 
 class FileMap implements Map
 {

@@ -1,7 +1,7 @@
 <?php
-namespace GreatOwl\Patches\Patch\Model;
+namespace TallTree\Roots\Patch\Model;
 
-use GreatOwl\Patches\Tools\Container;
+use TallTree\Roots\Tools\Container;
 
 class Patch
 {

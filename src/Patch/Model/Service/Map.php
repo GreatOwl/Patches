@@ -1,7 +1,7 @@
 <?php
-namespace GreatOwl\Patches\Patch\Model\Service;
+namespace TallTree\Roots\Patch\Model\Service;
 
-use GreatOwl\Patches\Patch\Model\Patch;
+use TallTree\Roots\Patch\Model\Patch;
 
 interface Map
 {

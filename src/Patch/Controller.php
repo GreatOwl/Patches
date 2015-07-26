@@ -1,12 +1,12 @@
 <?php
-namespace GreatOwl\Patches\Patch;
+namespace TallTree\Roots\Patch;
 
 
-use GreatOwl\Patches\Patch\Model\Service\Map;
-use GreatOwl\Patches\Patch\Model\Service\File\FileMap;
-use GreatOwl\Patches\Patch\Model\Patch;
-use GreatOwl\Patches\Service\Database\Query;
-use GreatOwl\Patches\Service\File\Handle;
+use TallTree\Roots\Patch\Model\Service\Map;
+use TallTree\Roots\Patch\Model\Service\File\FileMap;
+use TallTree\Roots\Patch\Model\Patch;
+use TallTree\Roots\Service\Database\Query;
+use TallTree\Roots\Service\File\Handle;
 
 class Controller
 {

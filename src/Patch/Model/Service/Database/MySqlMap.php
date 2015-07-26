@@ -1,10 +1,10 @@
 <?php
-namespace GreatOwl\Patches\Patch\Model\Service\Database;
+namespace TallTree\Roots\Patch\Model\Service\Database;
 
 
-use GreatOwl\Patches\Service\Database\Query;
-use GreatOwl\Patches\Patch\Model\Service\Map;
-use GreatOwl\Patches\Patch\Model\Patch;
+use TallTree\Roots\Service\Database\Query;
+use TallTree\Roots\Patch\Model\Service\Map;
+use TallTree\Roots\Patch\Model\Patch;
 
 class MySqlMap implements Map
 {

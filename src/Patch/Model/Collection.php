@@ -1,6 +1,6 @@
 <?php
 
-namespace GreatOwl\Patches\Patch\Model;
+namespace TallTree\Roots\Patch\Model;
 
 use IteratorAggregate;
 use ArrayIterator;
