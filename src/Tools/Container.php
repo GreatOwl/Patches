@@ -20,9 +20,17 @@ class Container
         return $default;
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return Container
+     */
     public function set($key, $value)
     {
-        $this->data[$key] = $value;
+        $data = $this->data;
+        $data[$key] = $value;
+
+        return new static($data);
     }
 
     public function has($key)

@@ -23,7 +23,7 @@
   },
   "autoload": {
     "psr-4": {
-      "TallTree\\Roots\\": "src"
+      "TallTree\\Roots\\": ["src", "testing/test/src"]
     }
   }
 }
