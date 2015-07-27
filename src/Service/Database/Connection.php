@@ -59,7 +59,7 @@ class Connection
         return $this->connection;
     }
 
-    public function setConnection(PDO $connection, $isConnectedToDB = true)
+    public function setConnection($connection, $isConnectedToDB = true)
     {
         $this->connection = $connection;
         $this->isConnectedToDB = $isConnectedToDB;
@@ -111,7 +111,7 @@ class Connection
         }
     }
 
-    protected function attemptToCreateDatabase(PDO $connection)
+    protected function attemptToCreateDatabase($connection)
     {
         if (!is_null($this->name)) {
             $dbname = $this->name;

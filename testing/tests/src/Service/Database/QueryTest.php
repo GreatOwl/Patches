@@ -6,12 +6,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     private function createPDO()
     {
-        $pdo = $this->getMockBuilder('PDO')
+        $pdo = $this->getMockBuilder('mockPDO')
             ->setMethods(['prepare'])
-            ->disableOriginalConstructor()
-            ->disableArgumentCloning()
-            ->disableOriginalClone()
-            ->disableProxyingToOriginalMethods()
             ->getMock();
         return $pdo;
     }
