@@ -14,8 +14,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     private function createPDOStatement()
     {
-        $statement = $this->getMockBuilder('PDOStatement')
-            ->disableOriginalConstructor()
+        $statement = $this->getMockBuilder('mockPDOStatement')
+            ->setMethods(['bindValue', 'execute', 'errorInfo', 'rowCount', 'fetchAll'])
             ->getMock();
         return $statement;
     }

@@ -1,7 +1,8 @@
 <?php
 
-class mockPDO extends PDO
+class mockPDOStatement
 {
+
     public function __construct()
     {
 
