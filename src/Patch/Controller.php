@@ -3,7 +3,6 @@ namespace TallTree\Roots\Patch;
 
 
 use TallTree\Roots\Patch\Model\Service\Map;
-use TallTree\Roots\Patch\Model\Service\File\FileMap;
 use TallTree\Roots\Patch\Model\Patch;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
@@ -17,7 +16,7 @@ class Controller
     private $dbMap;
     private $fileMap;
 
-    public function __construct(Repository $repository, Query $query, Handle $fileHandle, Map $dbMap, FileMap $fileMap)
+    public function __construct(Repository $repository, Query $query, Handle $fileHandle, Map $dbMap, Map $fileMap)
     {
         $this->repository = $repository;
         $this->query = $query;

@@ -51,28 +51,9 @@ class Repository
     {
         $patches = [];
         foreach ($rawPatches as $patch) {
-            $patches[] = $this->getFactory()->createPatch($patch);
+            $patches[] = $this->factory->createPatch($patch);
         }
 
         return $this->factory->createCollection($patches);
-    }
-
-    public function setFactory(Factory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    public function getFactory()
-    {
-        if (is_null($this->factory)) {
-            $this->setFactory($this->createFactory());
-        }
-
-        return $this->factory;
-    }
-
-    protected function createFactory()
-    {
-        return new Factory();
     }
 }
