@@ -16,13 +16,6 @@ class Collection implements IteratorAggregate
      */
     public function __construct(array $patches)
     {
-        foreach ($patches as $key => $patch) {
-            if (!$this->isValidTable($patch))
-            {
-                throw new \InvalidArgumentException('Invalid patch provided');
-            }
-        }
-
         $this->patches = $patches;
     }
 
@@ -38,13 +31,11 @@ class Collection implements IteratorAggregate
 
     public function diff(Collection $patches)
     {
-        if ($patches->getTable() == $this->getTable()) {
-            /** @var Patch $patch */
-            foreach ($patches as $patch) {
-                $key = $this->matchPatch($patch);
-                if (!is_null($key)) {
-                    $this->remove($key);
-                }
+        /** @var Patch $patch */
+        foreach ($patches as $patch) {
+            $key = $this->matchPatch($patch);
+            if (!is_null($key)) {
+                $this->remove($key);
             }
         }
 
@@ -71,28 +62,5 @@ class Collection implements IteratorAggregate
             }
         }
         return false;
-    }
-
-    public function getTable()
-    {
-        return $this->table;
-    }
-
-    public function isFromStorage()
-    {
-        return $this->stored;
-    }
-
-    private function isValidTable(Patch $patch)
-    {
-        if (is_null($this->table)) {
-            $this->table = $patch->getTable();
-            if (!is_null($patch->getId())) {
-                $this->stored = true;
-            }
-            return true;
-        }
-
-        return $this->table == $patch->getTable();
     }
 }

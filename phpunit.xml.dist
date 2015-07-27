@@ -31,7 +31,7 @@
     </filter>
 
     <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
     </logging>
 
     <php>
@@ -42,7 +42,7 @@
 
     <testsuites>
         <testsuite name="Unit Tests">
-            <directory>./tests/src</directory>
+            <directory>./testing/tests/src</directory>
         </testsuite>
     </testsuites>
 </phpunit>
