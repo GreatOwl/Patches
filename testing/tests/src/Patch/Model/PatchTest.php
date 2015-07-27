@@ -6,7 +6,6 @@
 
 namespace src\Patch\Model;
 
-
 use TallTree\Roots\Patch\Model\Patch;
 
 class PatchTest extends \PHPUnit_Framework_TestCase
@@ -23,7 +22,7 @@ class PatchTest extends \PHPUnit_Framework_TestCase
 
         $patch = new Patch($raw);
 
-        $this->assertInstanceOf(Patch::class, $patch);
+        $this->assertInstanceOf('TallTree\Roots\Patch\Model\Patch', $patch);
     }
 
     public function testGets()
@@ -59,7 +58,5 @@ class PatchTest extends \PHPUnit_Framework_TestCase
         ];
 
         $patch = new Patch($raw);
-
-        $this->assertInstanceOf(Patch::class, $patch);
     }
 }
