@@ -16,7 +16,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     private function createPDO()
     {
         $pdo = $this->getMockBuilder('PDO')
+            ->setMethods(['prepare', 'exec', 'query'])
             ->disableOriginalConstructor()
+            ->disableArgumentCloning()
+            ->disableOriginalClone()
+            ->disableProxyingToOriginalMethods()
             ->getMock();
         return $pdo;
     }
