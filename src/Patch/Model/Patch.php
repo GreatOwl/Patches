@@ -39,7 +39,7 @@ class Patch
         return $this->parameters->get('query');
     }
 
-    public function getRollback($default = '', $default)
+    public function getRollback($default = '')
     {
         return $this->parameters->get('rollback', $default);
     }
