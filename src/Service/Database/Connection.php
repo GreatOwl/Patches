@@ -9,6 +9,9 @@ class Connection
     const PDO_DSN_DATABASE = "%s:dbname=%s;host=%s";
     const PDO_DSN_NO_DATABASE = "%s:host=%s";
 
+    const SQL_CREATE = "CREATE DATABASE IF NOT EXISTS %s";
+    const SQL_USE = "use %s";
+
     /**
      * @var PdoFactory $pdoFactory
      */
@@ -112,8 +115,8 @@ class Connection
     {
         if (!is_null($this->name)) {
             $dbname = $this->name;
-            $connection->exec("CREATE DATABASE IF NOT EXISTS $dbname");
-            $connection->query("use $dbname");
+            $connection->exec(sprintf(static::SQL_CREATE, $dbname));
+            $connection->query(sprintf(static::SQL_USE, $dbname));
 
             $this->isConnectedToDB = true;
         }

@@ -18,8 +18,7 @@ class FileMap implements Map
 
     public function getPatches($table)
     {
-        $filepath = $this->dbDir . 'Patches/' . $table . '.json';
-        $patches = json_decode($this->filesystem->read($filepath), true);
+        list($patches) = $this->loadPatches($table);
         foreach ($patches as $key => &$patch) {
             $this->fixKeys($patch);
             $patch['patch'] = $key;
@@ -32,8 +31,7 @@ class FileMap implements Map
     {
         $table = $patch->getTable();
         $tablePatch = $patch->getPatch();
-        $filepath = $this->dbDir . 'Patches/' . $table . '.json';
-        $patches = json_decode($this->filesystem->read($filepath), true);
+        list($patches, $filepath) = $this->loadPatches($table);
         $patches[$tablePatch] = $patch->dump();
         $encoded = json_encode($patches, JSON_PRETTY_PRINT);
         $this->filesystem->delete($filepath);
@@ -42,18 +40,25 @@ class FileMap implements Map
 
     public function updatePatch(Patch $originalPatch, Patch $newPatch)
     {
-        $fields = array_diff_assoc($originalPatch->dump(), $newPatch->dump());
+        $fields = array_diff_assoc($newPatch->dump(), $originalPatch->dump());
         $fields['id'] = $originalPatch->getId();
         $table = $originalPatch->getTable();
         $tablePatch = $originalPatch->getPatch();
-        $filepath = $this->dbDir . 'Patches/' . $table . '.json';
-        $patches = json_decode($this->filesystem->read($filepath), true);
+        list($patches, $filepath) = $this->loadPatches($table);
         $currentPatch = $patches[$tablePatch];
         $mergedPatches = array_merge($currentPatch, $fields);
         $patches[$tablePatch] = $mergedPatches;
         $encoded = json_encode($patches, JSON_PRETTY_PRINT);
         $this->filesystem->delete($filepath);
         $this->filesystem->write($filepath, $encoded);
+    }
+
+    protected function loadPatches($table)
+    {
+        $filepath = $this->dbDir . 'Patches/' . $table . '.json';
+        $patches = json_decode($this->filesystem->read($filepath), true);
+
+        return [$patches, $filepath];
     }
 
     private function fixKeys($params)

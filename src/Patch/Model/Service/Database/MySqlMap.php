@@ -34,7 +34,7 @@ class MySqlMap implements Map
 
     public function updatePatch(Patch $originalPatch, Patch $newPatch)
     {
-        $fields = array_diff_assoc($originalPatch->dump(), $newPatch->dump());
+        $fields = array_diff_assoc($newPatch-> dump(), $originalPatch->dump());//, $newPatch->dump());
         $fields['id'] = $originalPatch->getId();
         $query = sprintf(static::UPDATE_PATCH, $this->buildSet($fields));
         $this->query->write($query, $fields);
