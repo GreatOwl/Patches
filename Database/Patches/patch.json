@@ -10,5 +10,11 @@
         "rollback": "ALTER TABLE patch ADD COLUMN status",
         "patch": 1,
         "table": "patch"
+    },
+    {
+        "query": "ALTER TABLE `patch` CHANGE `patch` `patch` int(16) DEFAULT '0' NOT NULL;",
+        "rollback": "ALTER TABLE `patch` CHANGE `patch` `patch` int(5) DEFAULT '0' NOT NULL;",
+        "patch": 2,
+        "table": "patch"
     }
 ]

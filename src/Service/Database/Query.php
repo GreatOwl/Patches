@@ -42,7 +42,7 @@ class Query
     public function read($statement, array $input)
     {
         $statement = $this->execute($statement, $input);
-        return $statement->fetchAll();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function determineType($value)

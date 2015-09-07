@@ -9,7 +9,7 @@ use TallTree\Roots\Install\Model\Service\Database\MySqlMap;
 use TallTree\Roots\Install\Model\Service\File\FileMap;
 use TallTree\Roots\Install\Factory;
 use TallTree\Roots\Install\Repository;
-use TallTree\Roots\Install\Handler;
+use TallTree\Roots\Install\Installer;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
@@ -43,7 +43,14 @@ $dbMap = new MySqlMap($query);
 $fileMap = new FileMap($fileSystem, $dbDir);
 $factory = new Factory();
 $repository = new Repository($dbMap, $fileMap, $factory);
-$worker = new Handler($repository, $query, $fileHandle, $dbMap, $fileMap);
+$worker = new Installer(
+    $repository,
+    $query,
+    $fileHandle,
+    $dbMap,
+    $fileMap,
+    $factory
+);
 
 $worker->installAll();
 

@@ -10,6 +10,12 @@ use TallTree\Roots\Patch\Model\Service\File\FileMap;
 use TallTree\Roots\Patch\Factory;
 use TallTree\Roots\Patch\Repository;
 use TallTree\Roots\Patch\Patcher;
+use TallTree\Roots\Patch\FilterFactory;
+use TallTree\Roots\Install\Repository as InstallRepository;
+use TallTree\Roots\Install\Model\Service\File\FileMap as InstallFileMap;
+use TallTree\Roots\Install\Model\Service\Database\MySqlMap as InstallMySqlMap;
+use TallTree\Roots\Install\Factory as InstallFactory;
+use TallTree\Roots\Install\Installer;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
@@ -42,8 +48,32 @@ $fileHandle = new Handle($fileSystem, $dbDir);
 $dbMap = new MySqlMap($query);
 $fileMap = new FileMap($fileSystem, $dbDir);
 $factory = new Factory();
+$filterFactory = new FilterFactory();
 $repository = new Repository($dbMap, $fileMap, $factory);
-$worker = new Patcher($repository, $query, $fileHandle, $dbMap, $fileMap);
+
+$installDbMap = new InstallMySqlMap($query);
+$installFileMap = new InstallFileMap($fileSystem, $dbDir);
+$installFactory = new InstallFactory();
+$installRepository = new InstallRepository($installDbMap, $installFileMap, $installFactory);
+$installer = new Installer(
+    $installRepository,
+    $query,
+    $fileHandle,
+    $installDbMap,
+    $installFileMap,
+    $installFactory
+);
+
+$worker = new Patcher(
+    $repository,
+    $filterFactory,
+    $query,
+    $fileHandle,
+    $dbMap,
+    $fileMap,
+    $installRepository,
+    $installer
+);
 
 $worker->patchAll();
 

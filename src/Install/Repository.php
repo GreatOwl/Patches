@@ -34,7 +34,7 @@ class Repository
         if (!is_null($rawInstall)) {
             return $this->factory->createInstall($rawInstall);//$this->buildInstall($rawInstalls);
         } else {
-            return null;
+            return null; //$this->factory->createInstall(['tabele' => $table, 'install' => '']);
         }
     }
 

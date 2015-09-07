@@ -7,7 +7,7 @@ use TallTree\Roots\Install\Model\Install;
 
 class MySqlMap implements Map
 {
-    const SELECT_PATCHES_TABLE = "SELECT `id`, `table` FROM `install` WHERE `table` = :table";
+    const SELECT_PATCHES_TABLE = "SELECT `id`, `table`, `install`, `patch` FROM `install` WHERE `table` = :table";
     const SHOW_CREATE_TABLE = "SHOW CREATE TABLE `%s`";
     const APPLY_PATCH = "INSERT INTO `install` SET %s";
     const UPDATE_PATCH = "UPDATE `install` SET %s WHERE id = :id";
@@ -24,7 +24,11 @@ class MySqlMap implements Map
     {
         $results = $this->query->read(static::SELECT_PATCHES_TABLE, ['table' => $table]);
         if (!empty($results)) {
-            $results['install'] = $this->query->read(static::SHOW_CREATE_TABLE, []);
+            $results = $results[0];
+            $install = $this->query->read(sprintf(static::SHOW_CREATE_TABLE, $table), []);
+            if (!empty($install)) {
+                $results['install'] = $install[0]['Create Table'];
+            }
         } else {
             $results = ['table' => $table, 'install' => ''];
         }

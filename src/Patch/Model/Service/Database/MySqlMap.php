@@ -8,7 +8,7 @@ use TallTree\Roots\Patch\Model\Patch;
 
 class MySqlMap implements Map
 {
-    const SELECT_PATCHES_TABLE = "SELECT `id`, `table`, `patch`, `query`, `rollback` FROM patch WHERE `table` = :table AND `status` = true";
+    const SELECT_PATCHES_TABLE = "SELECT `id`, `table`, `patch`, `query`, `rollback` FROM patch WHERE `table` = :table";
     const APPLY_PATCH = "INSERT INTO patch SET %s";
     const UPDATE_PATCH = "UPDATE patch SET %s WHERE id = :id";
     const SET_VALUE = "`%s` = :%s ";
@@ -22,6 +22,7 @@ class MySqlMap implements Map
 
     public function getPatches($table)
     {
+//        var_dump([static::SELECT_PATCHES_TABLE, ['table' => $table]]);
         return $this->query->read(static::SELECT_PATCHES_TABLE, ['table' => $table]);
     }
 
@@ -34,7 +35,7 @@ class MySqlMap implements Map
 
     public function updatePatch(Patch $originalPatch, Patch $newPatch)
     {
-        $fields = array_diff_assoc($newPatch-> dump(), $originalPatch->dump());//, $newPatch->dump());
+        $fields = array_diff_assoc($newPatch-> dump(), $originalPatch->dump());
         $fields['id'] = $originalPatch->getId();
         $query = sprintf(static::UPDATE_PATCH, $this->buildSet($fields));
         $this->query->write($query, $fields);

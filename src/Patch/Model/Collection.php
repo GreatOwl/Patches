@@ -8,8 +8,6 @@ use ArrayIterator;
 class Collection implements IteratorAggregate
 {
     private $patches;
-    private $table;
-    private $stored = false;
 
     /**
      * @param Patch[] $patches
@@ -19,48 +17,44 @@ class Collection implements IteratorAggregate
         $this->patches = $patches;
     }
 
+    /**
+     * @return ArrayIterator
+     */
     public function getIterator()
     {
         return new ArrayIterator($this->patches);
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->patches);
     }
 
-    public function diff(Collection $patches)
+    /**
+     * @param callable $filter
+     * @return Collection
+     */
+    public function findAll(callable $filter)
     {
-        /** @var Patch $patch */
-        foreach ($patches as $patch) {
-            $key = $this->matchPatch($patch);
-            if (!is_null($key)) {
-                $this->remove($key);
-            }
-        }
+        $matches = array_filter($this->patches, $filter);
 
-        $this->patches = array_values($this->patches);
+        return new static($matches);
     }
 
-    public function remove($key)
+    /**
+     * @param callable $filter
+     * @return Patch|null
+     */
+    public function find(callable $filter)
     {
-        if (array_key_exists($key, $this->patches)) {
-            unset($this->patches[$key]);
+        $matches = $this->findAll($filter);
+        $matches = $matches->getIterator();
+        if ($matches->offsetExists(0)) {
+            return $matches->offsetGet(0);
         }
-    }
-
-    public function matchPatch(Patch $patch)
-    {
-        foreach ($this->patches as $key => $localPatch) {
-            //This should be the case if both patches have the same history.
-            if ($patch->getPatch() === $localPatch->getPatch() && $patch->getQuery() == $localPatch->getQuery()) {
-                return $key;
-            }
-            //This should be the case if patches have a different history, or essentially do the same thing.
-            if ($patch->getQuery() === $localPatch->getQuery()) {
-                return $key;
-            }
-        }
-        return false;
+        return null;
     }
 }
