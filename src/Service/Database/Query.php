@@ -16,7 +16,7 @@ class Query
         $this->connection = $connection->getConnection();
     }
 
-    protected function execute($statement, array $input = [])
+    public function execute($statement, array $input = [])
     {
         $statement = $this->connection->prepare($statement);
         foreach ($input as $field => $value) {

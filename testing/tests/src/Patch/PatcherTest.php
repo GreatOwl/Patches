@@ -1,7 +1,7 @@
 <?php
 namespace TallTree\Roots\Patch;
 
-class ControllerTest extends \PHPUnit_Framework_TestCase
+class PatcherTest extends \PHPUnit_Framework_TestCase
 {
 
     private function createRepository()
@@ -92,7 +92,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($table))
             ->will($this->returnValue($fileCollection));
 
-        $controller = new Controller($repo, $query, $handle, $dbMap, $fileMap);
+        $controller = new Patcher($repo, $query, $handle, $dbMap, $fileMap);
 
         $controller->patchTable($table);
     }
@@ -144,7 +144,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->method('applyPatch')
             ->with($this->equalTo($patch));
 
-        $controller = new Controller($repo, $query, $handle, $dbMap, $fileMap);
+        $controller = new Patcher($repo, $query, $handle, $dbMap, $fileMap);
 
         $controller->patchTable($table);
     }
@@ -200,7 +200,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getAllFilesInDir')
             ->will($this->returnValue([$table]));
 
-        $controller = new Controller($repo, $query, $handle, $dbMap, $fileMap);
+        $controller = new Patcher($repo, $query, $handle, $dbMap, $fileMap);
 
         $controller->patchAll();
     }

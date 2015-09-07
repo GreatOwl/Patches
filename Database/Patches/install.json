@@ -1,0 +1,17 @@
+[
+    {
+        "query": "ALTER TABLE `install` ADD COLUMN patch int(5) DEFAULT '0'",
+        "rollback": "ALTER TABLE `install` DROP COLUMN patch",
+        "table": "install"
+    },
+    {
+        "query": "UPDATE `install` SET patch = 0 where patch IS null ",
+        "rollback": "UPDATE `install` SET patch = null where patch = 0",
+        "table": "install"
+    },
+    {
+        "query": "ALTER TABLE `install` CHANGE patch patch int(5) DEFAULT '0' NOT NULL",
+        "rollback": "ALTER TABLE `install` CHANGE patch patch int(5) DEFAULT '0'",
+        "table": "install"
+    }
+]

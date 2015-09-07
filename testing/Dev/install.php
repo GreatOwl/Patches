@@ -5,11 +5,11 @@ use TallTree\Roots\Service\Database\Connection;
 use TallTree\Roots\Service\Database\PdoFactory;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
-use TallTree\Roots\Patch\Model\Service\Database\MySqlMap;
-use TallTree\Roots\Patch\Model\Service\File\FileMap;
-use TallTree\Roots\Patch\Factory;
-use TallTree\Roots\Patch\Repository;
-use TallTree\Roots\Patch\Patcher;
+use TallTree\Roots\Install\Model\Service\Database\MySqlMap;
+use TallTree\Roots\Install\Model\Service\File\FileMap;
+use TallTree\Roots\Install\Factory;
+use TallTree\Roots\Install\Repository;
+use TallTree\Roots\Install\Handler;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
@@ -43,7 +43,7 @@ $dbMap = new MySqlMap($query);
 $fileMap = new FileMap($fileSystem, $dbDir);
 $factory = new Factory();
 $repository = new Repository($dbMap, $fileMap, $factory);
-$worker = new Patcher($repository, $query, $fileHandle, $dbMap, $fileMap);
+$worker = new Handler($repository, $query, $fileHandle, $dbMap, $fileMap);
 
-$worker->patchAll();
+$worker->installAll();
 

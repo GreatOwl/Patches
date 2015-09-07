@@ -8,7 +8,7 @@ interface Map
 
     /**
      * @param string $table
-     * @return Patch
+     * @return array
      */
     public function getPatches($table);
 

@@ -7,7 +7,7 @@ use TallTree\Roots\Patch\Model\Patch;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
 
-class Controller
+class Patcher
 {
 
     private $repository;

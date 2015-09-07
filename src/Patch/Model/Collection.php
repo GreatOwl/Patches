@@ -25,7 +25,7 @@ class Collection implements IteratorAggregate
     }
 
     public function count()
-{
+    {
         return count($this->patches);
     }
 
