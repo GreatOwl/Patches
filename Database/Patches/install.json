@@ -20,7 +20,7 @@
     {
         "query": "ALTER TABLE `install` CHANGE `patch` `patch` int(16) DEFAULT '0' NOT NULL;",
         "rollback": "ALTER TABLE `install` CHANGE `patch` `patch` int(5) DEFAULT '0' NOT NULL;",
-        "patch": 3,
-        "table": "install"
+        "table": "install",
+        "patch": 3
     }
 ]

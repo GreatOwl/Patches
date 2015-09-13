@@ -50,7 +50,7 @@ class Installer
 
     public function updateInstallScripts(Install $originalInstall, Collection $patched, $patchCount)
     {
-        if ($patchCount > 0) {
+        if ($patchCount >= 0) {
             $last = $patched->count() - 1;
             $patched = $patched->getIterator();
             /** @var Patch $lastPatch */
