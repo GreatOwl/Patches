@@ -27,12 +27,16 @@ class MySqlMap implements Map
             $results = $results[0];
             $install = $this->query->read(sprintf(static::SHOW_CREATE_TABLE, $table), []);
             if (!empty($install)) {
-                $results['install'] = $install[0]['Create Table'];
+                $results['install'] = preg_replace(
+                    '#AUTO_INCREMENT=\d+#',
+                    'AUTO_INCREMENT=0',
+                    $install[0]['Create Table']
+                );
             }
         } else {
             $results = ['table' => $table, 'install' => ''];
         }
-        return $results; //$this->query->read(static::SELECT_PATCHES_TABLE, ['table' => $table]);
+        return $results;
     }
 
     public function applyInstall(Install $install)

@@ -1,9 +1,4 @@
 <?php
-/**
- * @copyright ©2005—2015 Quicken Loans Inc. All rights reserved. Trade Secret, Confidential and Proprietary. Any
- *     dissemination outside of Quicken Loans is strictly prohibited.
- */
-
 namespace TallTree\Roots\Patch;
 
 use TallTree\Roots\Install\Model\Install;
@@ -21,13 +16,19 @@ class FilterFactory
     public function findUnmatched(Collection $patched)
     {
         return function(Patch $patch) use ($patched) {
+            $patchStatement = $patch->getPatch();
+            $patchQuery = $patch->getQuery();
+
             /** @var Patch $usedPatch */
             foreach ($patched as $usedPatch) {
-                if ($patch->getPatch() === $usedPatch->getPatch() && $patch->getQuery() == $usedPatch->getQuery()) {
+                $usedPatchStatement = $usedPatch->getPatch();
+                $usedPatchQuery = $usedPatch->getQuery();
+
+                if ($patchStatement === $usedPatchStatement && $patchQuery == $usedPatchQuery) {
                     return false;
                 }
 
-                if ($patch->getQuery() === $usedPatch->getPatch()) {
+                if ($patchQuery === $usedPatchStatement) {
                     return false;
                 }
             }
@@ -44,10 +45,13 @@ class FilterFactory
     public function findAfterInstall(Install $originalInstall)
     {
         return function(Patch $patch) use ($originalInstall) {
-            if ($originalInstall->getPatch() == 0) {
-                return $patch->getPatch() >= $originalInstall->getPatch();
+            $patchNumber = $patch->getPatch();
+            $installPatchNumber = $originalInstall->getPatch();
+
+            if ($installPatchNumber == 0) {
+                return $patchNumber >= $installPatchNumber;
             } else {
-                return $patch->getPatch() > $originalInstall->getPatch();
+                return $patchNumber > $installPatchNumber;
             }
         };
     }

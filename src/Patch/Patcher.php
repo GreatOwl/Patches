@@ -65,7 +65,6 @@ class Patcher
 
         $lastCount = $unmatchedAfterInstall->count() - 1;
         $patched = $this->repository->buildPatchesFromDatabase($table);
-//        var_dump(['patched' => $unmatchedAfterInstall, 'count' => $lastCount, 'table' => $table]);
         $this->installer->updateInstallScripts($originalInstall, $patched, $lastCount);
     }
 

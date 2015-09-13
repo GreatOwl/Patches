@@ -28,8 +28,9 @@ $fileSystem = new Filesystem($adapter, [
     'visibility' => AdapterInterface::VISIBILITY_PRIVATE
 ]);
 
-$configurationFile = $fileSystem->read('testing/Dev/conf.yaml');
-$configuration = Yaml::parse($configurationFile);
+$configurationFile = $fileSystem->read('testing/Dev/conf.json');
+$configuration = json_decode($configurationFile, true);
+//$configuration = Yaml::parse($configurationFile);
 
 $database = $configuration['database'];
 $dbDir = $configuration['directory'];

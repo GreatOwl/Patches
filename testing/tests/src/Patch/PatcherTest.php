@@ -12,6 +12,14 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         return $repository;
     }
 
+    private function createFilterFactory()
+    {
+        $filterFactory = $this->getMockBuilder('TallTree\Roots\Patch\FilterFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $filterFactory;
+    }
+
     private function createQuery()
     {
         $query = $this->getMockBuilder('TallTree\Roots\Service\Database\Query')
@@ -52,6 +60,36 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         return $collection;
     }
 
+    private function createInstallRepository()
+    {
+        $installRepository = $this->getMockBuilder('TallTree\Roots\Install\Repository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $installRepository;
+    }
+
+    private function createInstaller()
+    {
+        $installer = $this->getMockBuilder('TallTree\Roots\Install\Installer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $installer;
+    }
+
+    private function createInstall()
+    {
+        $install = $this->getMockBuilder('TallTree\Roots\Install\Model\Install')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $install;
+    }
+
+    private function createCallable() {
+        return function() {
+
+        };
+    }
+
     public function testPatchTablePatchErrors()
     {
         $repo = $this->createRepository();
@@ -59,6 +97,10 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         $handle = $this->createFileHandle();
         $fileMap = $this->createMap();
         $dbMap = $this->createMap();
+        $filterFactory = $this->createFilterFactory();
+        $installRepository = $this->createInstallRepository();
+        $installer = $this->createInstaller();
+        $install = $this->createInstall();
 
         $table = 'someTable';
         $queryString = 'someQuery';
@@ -66,6 +108,43 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
 
         $dbCollection = $this->createCollection();
         $fileCollection = $this->createCollection();
+
+        $repo->expects($this->exactly(2))
+            ->method('buildPatchesFromDatabase')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($dbCollection));
+        $repo->expects($this->once())
+            ->method('buildPatchesFromFile')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($fileCollection));
+
+        $installRepository->expects($this->once())
+            ->method('buildInstallFromFile')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($install));
+
+        $findUnmatched = $this->createCallable();
+        $filterFactory->expects($this->once())
+            ->method('findUnmatched')
+            ->with($this->equalTo($dbCollection))
+            ->will($this->returnValue($findUnmatched));
+        $findAfterInstall = $this->createCallable();
+        $filterFactory->expects($this->once())
+            ->method('findAfterInstall')
+            ->with($this->equalTo($install))
+            ->will($this->returnValue($findAfterInstall));
+
+        $unmatched = $this->createCollection();
+        $fileCollection->expects($this->once())
+            ->method('findAll')
+            ->with($this->equalTo($findUnmatched))
+            ->will($this->returnValue($unmatched));
+
+        $unmatchedAfterInstall = $this->createCollection();
+        $unmatched->expects($this->once())
+            ->method('findAll')
+            ->with($this->equalTo($findAfterInstall))
+            ->will($this->returnValue($unmatchedAfterInstall));
 
         $patch = $this->createPatch();
         $patch->expects($this->once())
@@ -77,22 +156,24 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($queryString))
             ->will($this->returnValue($error));
 
-        $fileCollection->expects($this->once())
-            ->method('diff');
-        $fileCollection->expects($this->once())
+        $unmatchedAfterInstall->expects($this->once())
             ->method('getIterator')
             ->will($this->returnValue(new \ArrayIterator([$patch])));
 
-        $repo->expects($this->once())
-            ->method('buildPatchesFromDatabase')
-            ->with($this->equalTo($table))
-            ->will($this->returnValue($dbCollection));
-        $repo->expects($this->once())
-            ->method('buildPatchesFromFile')
-            ->with($this->equalTo($table))
-            ->will($this->returnValue($fileCollection));
+        $installer->expects($this->once())
+            ->method('updateInstallScripts')
+            ->with($this->equalTo($install), $this->equalTo($dbCollection));
 
-        $controller = new Patcher($repo, $query, $handle, $dbMap, $fileMap);
+        $controller = new Patcher(
+            $repo,
+            $filterFactory,
+            $query,
+            $handle,
+            $dbMap,
+            $fileMap,
+            $installRepository,
+            $installer
+        );
 
         $controller->patchTable($table);
     }
@@ -104,6 +185,10 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         $handle = $this->createFileHandle();
         $fileMap = $this->createMap();
         $dbMap = $this->createMap();
+        $filterFactory = $this->createFilterFactory();
+        $installRepository = $this->createInstallRepository();
+        $installer = $this->createInstaller();
+        $install = $this->createInstall();
 
         $table = 'someTable';
         $queryString = 'someQuery';
@@ -111,6 +196,43 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
 
         $dbCollection = $this->createCollection();
         $fileCollection = $this->createCollection();
+
+        $repo->expects($this->exactly(2))
+            ->method('buildPatchesFromDatabase')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($dbCollection));
+        $repo->expects($this->once())
+            ->method('buildPatchesFromFile')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($fileCollection));
+
+        $installRepository->expects($this->once())
+            ->method('buildInstallFromFile')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($install));
+
+        $findUnmatched = $this->createCallable();
+        $filterFactory->expects($this->once())
+            ->method('findUnmatched')
+            ->with($this->equalTo($dbCollection))
+            ->will($this->returnValue($findUnmatched));
+        $findAfterInstall = $this->createCallable();
+        $filterFactory->expects($this->once())
+            ->method('findAfterInstall')
+            ->with($this->equalTo($install))
+            ->will($this->returnValue($findAfterInstall));
+
+        $unmatched = $this->createCollection();
+        $fileCollection->expects($this->once())
+            ->method('findAll')
+            ->with($this->equalTo($findUnmatched))
+            ->will($this->returnValue($unmatched));
+
+        $unmatchedAfterInstall = $this->createCollection();
+        $unmatched->expects($this->once())
+            ->method('findAll')
+            ->with($this->equalTo($findAfterInstall))
+            ->will($this->returnValue($unmatchedAfterInstall));
 
         $patch = $this->createPatch();
         $patch->expects($this->once())
@@ -122,20 +244,9 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($queryString))
             ->will($this->returnValue($error));
 
-        $fileCollection->expects($this->once())
-            ->method('diff');
-        $fileCollection->expects($this->once())
+        $unmatchedAfterInstall->expects($this->once())
             ->method('getIterator')
             ->will($this->returnValue(new \ArrayIterator([$patch])));
-
-        $repo->expects($this->once())
-            ->method('buildPatchesFromDatabase')
-            ->with($this->equalTo($table))
-            ->will($this->returnValue($dbCollection));
-        $repo->expects($this->once())
-            ->method('buildPatchesFromFile')
-            ->with($this->equalTo($table))
-            ->will($this->returnValue($fileCollection));
 
         $dbMap->expects($this->once())
             ->method('applyPatch')
@@ -144,7 +255,20 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             ->method('applyPatch')
             ->with($this->equalTo($patch));
 
-        $controller = new Patcher($repo, $query, $handle, $dbMap, $fileMap);
+        $installer->expects($this->once())
+            ->method('updateInstallScripts')
+            ->with($this->equalTo($install), $this->equalTo($dbCollection));
+
+        $controller = new Patcher(
+            $repo,
+            $filterFactory,
+            $query,
+            $handle,
+            $dbMap,
+            $fileMap,
+            $installRepository,
+            $installer
+        );;
 
         $controller->patchTable($table);
     }
@@ -156,6 +280,10 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         $handle = $this->createFileHandle();
         $fileMap = $this->createMap();
         $dbMap = $this->createMap();
+        $filterFactory = $this->createFilterFactory();
+        $installRepository = $this->createInstallRepository();
+        $installer = $this->createInstaller();
+        $install = $this->createInstall();
 
         $table = 'someTable';
         $queryString = 'someQuery';
@@ -163,6 +291,47 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
 
         $dbCollection = $this->createCollection();
         $fileCollection = $this->createCollection();
+
+        $handle->expects($this->once())
+            ->method('getAllFilesInDir')
+            ->will($this->returnValue([$table]));
+
+        $repo->expects($this->exactly(2))
+            ->method('buildPatchesFromDatabase')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($dbCollection));
+        $repo->expects($this->once())
+            ->method('buildPatchesFromFile')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($fileCollection));
+
+        $installRepository->expects($this->once())
+            ->method('buildInstallFromFile')
+            ->with($this->equalTo($table))
+            ->will($this->returnValue($install));
+
+        $findUnmatched = $this->createCallable();
+        $filterFactory->expects($this->once())
+            ->method('findUnmatched')
+            ->with($this->equalTo($dbCollection))
+            ->will($this->returnValue($findUnmatched));
+        $findAfterInstall = $this->createCallable();
+        $filterFactory->expects($this->once())
+            ->method('findAfterInstall')
+            ->with($this->equalTo($install))
+            ->will($this->returnValue($findAfterInstall));
+
+        $unmatched = $this->createCollection();
+        $fileCollection->expects($this->once())
+            ->method('findAll')
+            ->with($this->equalTo($findUnmatched))
+            ->will($this->returnValue($unmatched));
+
+        $unmatchedAfterInstall = $this->createCollection();
+        $unmatched->expects($this->once())
+            ->method('findAll')
+            ->with($this->equalTo($findAfterInstall))
+            ->will($this->returnValue($unmatchedAfterInstall));
 
         $patch = $this->createPatch();
         $patch->expects($this->once())
@@ -174,20 +343,9 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($queryString))
             ->will($this->returnValue($error));
 
-        $fileCollection->expects($this->once())
-            ->method('diff');
-        $fileCollection->expects($this->once())
+        $unmatchedAfterInstall->expects($this->once())
             ->method('getIterator')
             ->will($this->returnValue(new \ArrayIterator([$patch])));
-
-        $repo->expects($this->once())
-            ->method('buildPatchesFromDatabase')
-            ->with($this->equalTo($table))
-            ->will($this->returnValue($dbCollection));
-        $repo->expects($this->once())
-            ->method('buildPatchesFromFile')
-            ->with($this->equalTo($table))
-            ->will($this->returnValue($fileCollection));
 
         $dbMap->expects($this->once())
             ->method('applyPatch')
@@ -196,11 +354,20 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             ->method('applyPatch')
             ->with($this->equalTo($patch));
 
-        $handle->expects($this->once())
-            ->method('getAllFilesInDir')
-            ->will($this->returnValue([$table]));
+        $installer->expects($this->once())
+            ->method('updateInstallScripts')
+            ->with($this->equalTo($install), $this->equalTo($dbCollection));
 
-        $controller = new Patcher($repo, $query, $handle, $dbMap, $fileMap);
+        $controller = new Patcher(
+            $repo,
+            $filterFactory,
+            $query,
+            $handle,
+            $dbMap,
+            $fileMap,
+            $installRepository,
+            $installer
+        );
 
         $controller->patchAll();
     }

@@ -11,10 +11,10 @@
         mapTestClassNameToCoveredClassName="true"
         processIsolation="false"
 
-        stopOnError="true"
-        stopOnFailure="true"
-        stopOnIncomplete="true"
-        stopOnSkipped="true"
+        stopOnError="false"
+        stopOnFailure="false"
+        stopOnIncomplete="false"
+        stopOnSkipped="false"
 
         beStrictAboutTestsThatDoNotTestAnything="false"
         beStrictAboutOutputDuringTests="true"
