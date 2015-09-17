@@ -32,9 +32,9 @@ class Repository
     {
         $rawInstall = $this->dbMap->getInstall($table);
         if (!is_null($rawInstall)) {
-            return $this->factory->createInstall($rawInstall);//$this->buildInstall($rawInstalls);
+            return $this->factory->createInstall($rawInstall);
         } else {
-            return null; //$this->factory->createInstall(['tabele' => $table, 'install' => '']);
+            return null;
         }
     }
 
@@ -42,7 +42,7 @@ class Repository
     {
         $rawInstall = $this->fileMap->getInstall($table);
         if (!is_null($rawInstall)) {
-            return $this->factory->createInstall($rawInstall);//$this->buildInstall($rawInstalls);
+            return $this->factory->createInstall($rawInstall);
         } else {
             return null;
         }

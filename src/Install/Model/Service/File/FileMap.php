@@ -20,12 +20,6 @@ class FileMap implements Map
     {
         $filepath = $this->loadFilepath($table);
         $installs = json_decode($this->filesystem->read($filepath), true);
-        if (array_key_exists(0 , $installs)) {
-            $install = $installs[0];
-            $this->fixKeys($install);
-        } else {
-            $install = [];
-        }
         $install['table'] = $table;
         return $installs;
     }
@@ -53,18 +47,5 @@ class FileMap implements Map
         $filepath = $this->dbDir . 'install/' . $table . '.json';
 
         return $filepath;
-    }
-
-    private function fixKeys($params)
-    {
-        $keys = array_keys($params);
-        $original = $keys;
-        array_map('strtolower', $keys);
-        foreach ($original as $key => $value) {
-            $newKey = $keys[$key];
-            unset($params[$key]);
-            $params[$newKey];
-        }
-        return $params;
     }
 }

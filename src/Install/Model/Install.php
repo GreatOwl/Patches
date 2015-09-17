@@ -48,7 +48,6 @@ class Install
     {
         foreach ($requiredParams as $param) {
             if (!array_key_exists($param, $raw)) {
-                var_dump(['search' => $param, "raw" => $raw, "result" => $raw[$param]]);
                 throw new \InvalidArgumentException($param . ' is a required parameter.');
             }
         }
