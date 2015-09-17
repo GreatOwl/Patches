@@ -6,5 +6,9 @@
     "username": "dbuser",
     "password": "123"
   },
-  "directory": "Database/"
+  "directory": "Database/",
+  "namespaces": {
+    "roots": "roots",
+    "app": "roots"
+  }
 }

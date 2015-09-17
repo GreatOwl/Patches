@@ -46,13 +46,13 @@ $connection = new Connection(
 
 $query = new Query($connection);
 $fileHandle = new Handle($fileSystem, $dbDir);
-$dbMap = new MySqlMap($query);
+$dbMap = new MySqlMap($query, $configuration['namespaces']);
 $fileMap = new FileMap($fileSystem, $dbDir);
 $factory = new Factory();
 $filterFactory = new FilterFactory();
 $repository = new Repository($dbMap, $fileMap, $factory);
 
-$installDbMap = new InstallMySqlMap($query);
+$installDbMap = new InstallMySqlMap($query, $configuration['namespaces']);
 $installFileMap = new InstallFileMap($fileSystem, $dbDir);
 $installFactory = new InstallFactory();
 $installRepository = new InstallRepository($installDbMap, $installFileMap, $installFactory);
@@ -62,7 +62,8 @@ $installer = new Installer(
     $fileHandle,
     $installDbMap,
     $installFileMap,
-    $installFactory
+    $installFactory,
+    $configuration['namespaces']
 );
 
 $worker = new Patcher(

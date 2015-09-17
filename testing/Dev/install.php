@@ -40,7 +40,7 @@ $connection = new Connection(
 
 $query = new Query($connection);
 $fileHandle = new Handle($fileSystem, $dbDir);
-$dbMap = new MySqlMap($query);
+$dbMap = new MySqlMap($query, $configuration['namespaces']);
 $fileMap = new FileMap($fileSystem, $dbDir);
 $factory = new Factory();
 $repository = new Repository($dbMap, $fileMap, $factory);
@@ -50,7 +50,8 @@ $worker = new Installer(
     $fileHandle,
     $dbMap,
     $fileMap,
-    $factory
+    $factory,
+    $configuration['namespaces']
 );
 
 $worker->installAll();

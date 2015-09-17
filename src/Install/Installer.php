@@ -3,14 +3,17 @@ namespace TallTree\Roots\Install;
 
 
 use TallTree\Roots\Install\Model\Install;
+use TallTree\Roots\Install\Model\Service\Database\MySqlMap;
 use TallTree\Roots\Install\Model\Service\Map;
 use TallTree\Roots\Patch\Model\Collection;
 use TallTree\Roots\Patch\Model\Patch;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
+use TallTree\Roots\Tools\NameSpaceLoader;
 
 class Installer
 {
+    use NameSpaceLoader;
 
     private $repository;
     private $query;
@@ -25,7 +28,8 @@ class Installer
         Handle $fileHandle,
         Map $dbMap,
         Map $fileMap,
-        Factory $factory
+        Factory $factory,
+        $namespaces = []
     ) {
         $this->repository = $repository;
         $this->query = $query;
@@ -33,6 +37,7 @@ class Installer
         $this->dbMap = $dbMap;
         $this->fileMap = $fileMap;
         $this->factory = $factory;
+        $this->loadNameSpaces($namespaces);
     }
 
     public function installTable($table)
@@ -43,6 +48,7 @@ class Installer
         $unInstalledProof = $unInstalled->getInstall();
 
         if (empty($installedProof) && !empty($unInstalledProof)) {
+            $unInstalledProof = str_replace("FROM `$table`", "FROM " . sprintf(MySqlMap::TABLE_APP, $this->appNamespace, $table), $unInstalledProof);
             $error = $this->query->patch($unInstalledProof);
             if (is_null($error[2])) {
                 $this->dbMap->applyInstall($unInstalled);
