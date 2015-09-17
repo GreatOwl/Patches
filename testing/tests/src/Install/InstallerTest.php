@@ -92,6 +92,9 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $installed->expects($this->once())
             ->method('getInstall')
             ->willReturn('stuff');
+        $unInstalled->expects($this->once())
+            ->method('getInstall')
+            ->willReturn('stuff');
 
         $installer = new Installer(
             $repository,
@@ -170,7 +173,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $installed->expects($this->once())
             ->method('getInstall')
             ->willReturn(null);
-        $unInstalled->expects($this->exactly(2))
+        $unInstalled->expects($this->once())
             ->method('getInstall')
             ->willReturn($installScript);
 
@@ -216,7 +219,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $installed->expects($this->once())
             ->method('getInstall')
             ->willReturn(null);
-        $unInstalled->expects($this->exactly(2))
+        $unInstalled->expects($this->once())
             ->method('getInstall')
             ->willReturn($installScript);
 
@@ -301,7 +304,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $installed->expects($this->once())
             ->method('getInstall')
             ->willReturn(null);
-        $unInstalled->expects($this->exactly(2))
+        $unInstalled->expects($this->once())
             ->method('getInstall')
             ->willReturn($installScript);
 
@@ -410,7 +413,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $fileMap->expects($this->once())
             ->method('updateInstall')
             ->with($this->equalTo($originalInstall), $this->equalTo($newInstall));
-        
+
         $installer = new Installer(
             $repository,
             $query,

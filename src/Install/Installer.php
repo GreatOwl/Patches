@@ -38,9 +38,12 @@ class Installer
     public function installTable($table)
     {
         $installed = $this->repository->buildInstallFromDatabase($table);
+        $installedProof = $installed->getInstall();
         $unInstalled = $this->repository->buildInstallFromFile($table);
-        if (empty($installed->getInstall()) && !empty($unInstalled->getInstall())) {
-            $error = $this->query->patch($unInstalled->getInstall());
+        $unInstalledProof = $unInstalled->getInstall();
+
+        if (empty($installedProof) && !empty($unInstalledProof)) {
+            $error = $this->query->patch($unInstalledProof);
             if (is_null($error[2])) {
                 $this->dbMap->applyInstall($unInstalled);
                 $this->fileMap->applyInstall($unInstalled);
