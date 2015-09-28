@@ -50,6 +50,11 @@ class Connection
         $this->name = $name;
     }
 
+    public function getType()
+    {
+        return $this->type;
+    }
+
     public function getConnection()
     {
         if (is_null($this->connection)) {

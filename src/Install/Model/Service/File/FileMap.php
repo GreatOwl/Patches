@@ -4,15 +4,19 @@ namespace TallTree\Roots\Install\Model\Service\File;
 use League\Flysystem\Filesystem;
 use TallTree\Roots\Install\Model\Service\Map;
 use TallTree\Roots\Install\Model\Install;
+use TallTree\Roots\Service\Transform\NameSpaces;
 
 class FileMap implements Map
 {
     private $filesystem;
+    private $transformer;
     private $dbDir;
+    private $dbOnlyFields = ['nameSpace'];
 
-    public function __construct(Filesystem $filesystem, $dbDir)
+    public function __construct(Filesystem $filesystem, NameSpaces $transformer, $dbDir)
     {
         $this->filesystem = $filesystem;
+        $this->transformer = $transformer;
         $this->dbDir = $dbDir;
     }
 
@@ -20,6 +24,7 @@ class FileMap implements Map
     {
         $filepath = $this->loadFilepath($table);
         $installs = json_decode($this->filesystem->read($filepath), true);
+        $install['nameSpace'] = $this->transformer->getAppNameSpace();
         $install['table'] = $table;
         return $installs;
     }
@@ -28,7 +33,9 @@ class FileMap implements Map
     {
         $table = $install->getTable();
         $filepath = $this->loadFilepath($table);
-        $encoded = json_encode($install->dump(), JSON_PRETTY_PRINT);
+        $fields = $install->dump();
+        $fields = $this->removeDbOnlyFields($fields);
+        $encoded = json_encode($fields, JSON_PRETTY_PRINT);
         $this->filesystem->delete($filepath);
         $this->filesystem->write($filepath, $encoded);
     }
@@ -37,9 +44,20 @@ class FileMap implements Map
     {
         $table = $originalInstall->getTable();
         $filepath = $this->loadFilepath($table);
-        $encoded = json_encode($newInstall->dump(), JSON_PRETTY_PRINT);
+        $fields = $newInstall->dump();
+        $fields = $this->removeDbOnlyFields($fields);
+        $encoded = json_encode($fields, JSON_PRETTY_PRINT);
         $this->filesystem->delete($filepath);
         $this->filesystem->write($filepath, $encoded);
+    }
+
+    private function removeDbOnlyFields($fields = [])
+    {
+        foreach ($this->dbOnlyFields as $field) {
+            unset($fields[$field]);
+        }
+
+        return $fields;
     }
 
     protected function loadFilepath($table)

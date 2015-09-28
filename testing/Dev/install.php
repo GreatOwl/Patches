@@ -1,19 +1,19 @@
 #!/usr/bin/env php
 <?php
 
-use TallTree\Roots\Service\Database\Connection;
-use TallTree\Roots\Service\Database\PdoFactory;
-use TallTree\Roots\Service\Database\Query;
-use TallTree\Roots\Service\File\Handle;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\AdapterInterface;
 use TallTree\Roots\Install\Model\Service\Database\MySqlMap;
 use TallTree\Roots\Install\Model\Service\File\FileMap;
 use TallTree\Roots\Install\Factory;
 use TallTree\Roots\Install\Repository;
 use TallTree\Roots\Install\Installer;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\AdapterInterface;
-use Symfony\Component\Yaml\Yaml;
+use TallTree\Roots\Service\Database\Connection;
+use TallTree\Roots\Service\Database\PdoFactory;
+use TallTree\Roots\Service\Database\Query;
+use TallTree\Roots\Service\File\Handle;
+use TallTree\Roots\Service\Transform\NameSpaces;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -24,7 +24,6 @@ $fileSystem = new Filesystem($adapter, [
 
 $configurationFile = $fileSystem->read('testing/Dev/conf.json');
 $configuration = json_decode($configurationFile, true);
-//$configuration = Yaml::parse($configurationFile);
 
 $database = $configuration['database'];
 $dbDir = $configuration['directory'];
@@ -40,8 +39,9 @@ $connection = new Connection(
 
 $query = new Query($connection);
 $fileHandle = new Handle($fileSystem, $dbDir);
-$dbMap = new MySqlMap($query, $configuration['namespaces']);
-$fileMap = new FileMap($fileSystem, $dbDir);
+$transformer = new NameSpaces($connection, $configuration['namespaces']);
+$dbMap = new MySqlMap($query, $transformer);
+$fileMap = new FileMap($fileSystem, $transformer, $dbDir);
 $factory = new Factory();
 $repository = new Repository($dbMap, $fileMap, $factory);
 $worker = new Installer(
@@ -51,7 +51,7 @@ $worker = new Installer(
     $dbMap,
     $fileMap,
     $factory,
-    $configuration['namespaces']
+    $transformer
 );
 
 $worker->installAll();

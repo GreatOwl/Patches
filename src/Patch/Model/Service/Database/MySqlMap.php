@@ -5,41 +5,41 @@ namespace TallTree\Roots\Patch\Model\Service\Database;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Patch\Model\Service\Map;
 use TallTree\Roots\Patch\Model\Patch;
-use TallTree\Roots\Tools\NameSpaceLoader;
+use TallTree\Roots\Service\Transform\NameSpaces;
 
 class MySqlMap implements Map
 {
-    use NameSpaceLoader;
-
-    const SELECT_PATCHES_TABLE = "SELECT `id`, `table`, `patch`, `query`, `rollback` FROM `%s` WHERE `table` = :table";
-    const APPLY_PATCH = "INSERT INTO `%s` SET %s";
-    const UPDATE_PATCH = "UPDATE `%s` SET %s WHERE id = :id";
+    const SELECT_PATCHES_TABLE = "SELECT * FROM `patch` WHERE `table` = :table";
+    const SHOW_COLUMNS = "SHOW COLUMNS FROM `patch`";
+    const APPLY_PATCH = "INSERT INTO `patch` SET %s";
+    const UPDATE_PATCH = "UPDATE `patch` SET %s WHERE id = :id";
     const SET_VALUE = "`%s` = :%s ";
-    const TABLE_ROOT = "%spatch";
-    const TABLE_APP = "`%s%s`";
-    const TABLE = "`%s`";
 
     private $query;
+    private $transformer;
 
-    public function __construct(Query $query, $namespaces = [])
+    public function __construct(Query $query, NameSpaces $transformer)
     {
         $this->query = $query;
-        $this->loadNameSpaces($namespaces);
+        $this->transformer = $transformer;
     }
 
     public function getPatches($table)
     {
         return $this->query->read(
-            sprintf(static::SELECT_PATCHES_TABLE, sprintf(static::TABLE_ROOT, $this->rootNamespace)),
+            $this->transformer->addNameSpaceToQuery(static::SELECT_PATCHES_TABLE, false),
             ['table' => $table]);
     }
 
     public function applyPatch(Patch $patch)
     {
         $fields = $patch->dump();
+        $fields['query'] = $this->transformer->removeNameSpaceFromQuery($fields['query']);
+        $fields['rollback'] = $this->transformer->removeNameSpaceFromQuery($fields['rollback']);
+        $fields['nameSpace'] = $this->transformer->getAppNameSpace();
+        $fields = $this->reduceFields($fields);
         $query = sprintf(
-            static::APPLY_PATCH,
-            sprintf(static::TABLE_ROOT, $this->rootNamespace),
+            $this->transformer->addNameSpaceToQuery(static::APPLY_PATCH, false),
             $this->buildSet($fields)
         );
         $this->query->write($query, $fields);
@@ -49,12 +49,31 @@ class MySqlMap implements Map
     {
         $fields = array_diff_assoc($newPatch-> dump(), $originalPatch->dump());
         $fields['id'] = $originalPatch->getId();
+        $fields['query'] = $this->transformer->removeNameSpaceFromQuery($fields['query']);
+        $fields['rollback'] = $this->transformer->removeNameSpaceFromQuery($fields['rollback']);
+        $fields['nameSpace'] = $this->transformer->getAppNameSpace();
+        $fields = $this->reduceFields($fields);
         $query = sprintf(
-            static::UPDATE_PATCH,
-            sprintf(static::TABLE_ROOT, $this->rootNamespace),
+            $this->transformer->addNameSpaceToQuery(static::UPDATE_PATCH,false),
             $this->buildSet($fields)
         );
         $this->query->write($query, $fields);
+    }
+
+    private function reduceFields($fields)
+    {
+        $columns = $this->loadColumns();
+        return array_intersect_key($fields, $columns);
+    }
+
+    private function loadColumns()
+    {
+        $columns = [];
+        $results = $this->query->read($this->transformer->addNameSpaceToQuery(static::SHOW_COLUMNS, false), []);
+        foreach ($results as $column) {
+            $columns[$column['Field']] = $column['Type'];
+        }
+        return $columns;
     }
 
     protected function buildSet($fields)

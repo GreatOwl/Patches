@@ -29,6 +29,11 @@ class Patch
         return $this->parameters->get('table');
     }
 
+    public function getNameSpace()
+    {
+        return $this->parameters->get('nameSpace');
+    }
+
     public function getPatch()
     {
         return $this->parameters->get('patch');

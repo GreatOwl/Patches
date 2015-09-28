@@ -5,6 +5,7 @@ use TallTree\Roots\Service\Database\Connection;
 use TallTree\Roots\Service\Database\PdoFactory;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
+use TallTree\Roots\Service\Transform\NameSpaces;
 use TallTree\Roots\Patch\Model\Service\Database\MySqlMap;
 use TallTree\Roots\Patch\Model\Service\File\FileMap;
 use TallTree\Roots\Patch\Factory;
@@ -19,7 +20,6 @@ use TallTree\Roots\Install\Installer;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
-use Symfony\Component\Yaml\Yaml;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -30,7 +30,6 @@ $fileSystem = new Filesystem($adapter, [
 
 $configurationFile = $fileSystem->read('testing/Dev/conf.json');
 $configuration = json_decode($configurationFile, true);
-//$configuration = Yaml::parse($configurationFile);
 
 $database = $configuration['database'];
 $dbDir = $configuration['directory'];
@@ -46,14 +45,15 @@ $connection = new Connection(
 
 $query = new Query($connection);
 $fileHandle = new Handle($fileSystem, $dbDir);
-$dbMap = new MySqlMap($query, $configuration['namespaces']);
-$fileMap = new FileMap($fileSystem, $dbDir);
+$transformer = new NameSpaces($connection, $configuration['namespaces']);
+$dbMap = new MySqlMap($query, $transformer);
+$fileMap = new FileMap($fileSystem, $transformer, $dbDir);
 $factory = new Factory();
 $filterFactory = new FilterFactory();
 $repository = new Repository($dbMap, $fileMap, $factory);
 
-$installDbMap = new InstallMySqlMap($query, $configuration['namespaces']);
-$installFileMap = new InstallFileMap($fileSystem, $dbDir);
+$installDbMap = new InstallMySqlMap($query, $transformer);
+$installFileMap = new InstallFileMap($fileSystem, $transformer, $dbDir);
 $installFactory = new InstallFactory();
 $installRepository = new InstallRepository($installDbMap, $installFileMap, $installFactory);
 $installer = new Installer(
@@ -63,7 +63,7 @@ $installer = new Installer(
     $installDbMap,
     $installFileMap,
     $installFactory,
-    $configuration['namespaces']
+    $transformer
 );
 
 $worker = new Patcher(
@@ -74,7 +74,8 @@ $worker = new Patcher(
     $dbMap,
     $fileMap,
     $installRepository,
-    $installer
+    $installer,
+    $transformer
 );
 
 $worker->patchAll();

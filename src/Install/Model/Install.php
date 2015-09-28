@@ -29,6 +29,11 @@ class Install
         return $this->parameters->get('table');
     }
 
+    public function getNameSpace()
+    {
+        return $this->parameters->get('nameSpace');
+    }
+
     public function getInstall()
     {
         return $this->parameters->get('install');

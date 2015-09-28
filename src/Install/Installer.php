@@ -3,24 +3,22 @@ namespace TallTree\Roots\Install;
 
 
 use TallTree\Roots\Install\Model\Install;
-use TallTree\Roots\Install\Model\Service\Database\MySqlMap;
 use TallTree\Roots\Install\Model\Service\Map;
 use TallTree\Roots\Patch\Model\Collection;
 use TallTree\Roots\Patch\Model\Patch;
 use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
-use TallTree\Roots\Tools\NameSpaceLoader;
+use TallTree\Roots\Service\Transform\NameSpaces;
 
 class Installer
 {
-    use NameSpaceLoader;
-
     private $repository;
     private $query;
     private $fileHandle;
     private $dbMap;
     private $fileMap;
     private $factory;
+    private $transformer;
 
     public function __construct(
         Repository $repository,
@@ -29,7 +27,7 @@ class Installer
         Map $dbMap,
         Map $fileMap,
         Factory $factory,
-        $namespaces = []
+        NameSpaces $transformer
     ) {
         $this->repository = $repository;
         $this->query = $query;
@@ -37,7 +35,7 @@ class Installer
         $this->dbMap = $dbMap;
         $this->fileMap = $fileMap;
         $this->factory = $factory;
-        $this->loadNameSpaces($namespaces);
+        $this->transformer = $transformer;
     }
 
     public function installTable($table)
@@ -48,8 +46,7 @@ class Installer
         $unInstalledProof = $unInstalled->getInstall();
 
         if (empty($installedProof) && !empty($unInstalledProof)) {
-            $unInstalledProof = str_replace("FROM `$table`", "FROM " . sprintf(MySqlMap::TABLE_APP, $this->appNamespace, $table), $unInstalledProof);
-            $error = $this->query->patch($unInstalledProof);
+            $error = $this->query->patch($this->transformer->addNameSpaceToQuery($unInstalledProof));
             if (is_null($error[2])) {
                 $this->dbMap->applyInstall($unInstalled);
                 $this->fileMap->applyInstall($unInstalled);
@@ -72,6 +69,7 @@ class Installer
                 'install' => $postPatchInstall->getInstall()
             ]);
             $this->fileMap->updateInstall($originalInstall, $newInstall);
+            $this->dbMap->updateInstall($originalInstall, $newInstall);
         }
     }
 

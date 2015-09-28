@@ -1,20 +1,26 @@
 [
     {
-        "query": "ALTER TABLE patch DROP COLUMN rollback_status",
-        "rollback": "ALTER TABLE patch ADD COLUMN rollback_status",
+        "query": "ALTER TABLE `patch` DROP COLUMN rollback_status",
+        "rollback": "ALTER TABLE `patch` ADD COLUMN rollback_status",
         "patch": 0,
         "table": "patch"
     },
     {
-        "query": "ALTER TABLE patch DROP COLUMN status",
-        "rollback": "ALTER TABLE patch ADD COLUMN status",
+        "query": "ALTER TABLE `patch` DROP COLUMN status",
+        "rollback": "ALTER TABLE `patch` ADD COLUMN status",
         "patch": 1,
         "table": "patch"
     },
     {
         "query": "ALTER TABLE `patch` CHANGE `patch` `patch` int(16) DEFAULT '0' NOT NULL;",
         "rollback": "ALTER TABLE `patch` CHANGE `patch` `patch` int(5) DEFAULT '0' NOT NULL;",
-        "table": "patch",
-        "patch": 2
+        "patch": 2,
+        "table": "patch"
+    },
+    {
+        "query": "ALTER TABLE `patch` add COLUMN `nameSpace` varchar(7) DEFAULT '' NOT NULL;",
+        "rollback": "ALTER TABLE `patch` DROP COLUMN `nameSpace`;",
+        "patch": 3,
+        "table": "patch"
     }
 ]
