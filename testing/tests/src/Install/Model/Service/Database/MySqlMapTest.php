@@ -20,26 +20,54 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         return $install;
     }
 
+    private function createNameSpacesTransform()
+    {
+        $nameSpaces = $this->getMockBuilder('TallTree\Roots\Service\Transform\NameSpaces')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $nameSpaces;
+    }
+
     public function testApplyInstallWithNoFields()
     {
         $fields = [];
 
         $allSet = '';
 
+        $columns = [];
+        $resultingColumnQuery = 'resultingQuery';
+
         $queryString = sprintf(MySqlMap::APPLY_PATCH, $allSet);
 
         $query = $this->createQuery();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
+
+        $nameSpaces->expects($this->at(0))
+            ->method('getAppNameSpace')
+            ->willReturn('root_');
+        $nameSpaces->expects($this->at(1))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::SHOW_COLUMNS), $this->equalTo(false))
+            ->willReturn($resultingColumnQuery);
+        $nameSpaces->expects($this->at(2))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::APPLY_PATCH), $this->equalTo(false))
+            ->willReturn($queryString);
 
         $install->expects($this->once())
             ->method('dump')
             ->will($this->returnValue($fields));
 
         $query->expects($this->once())
+            ->method('read')
+            ->with($this->equalTo($resultingColumnQuery))
+            ->willReturn($columns);
+        $query->expects($this->once())
             ->method('write')
             ->with($this->equalTo($queryString), $this->equalTo($fields));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $map->applyInstall($install);
     }
@@ -51,20 +79,40 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         $fooSet = sprintf(MySqlMap::SET_VALUE, 'foo', 'foo');
         $allSet = $fooSet;
 
+        $columns = [['Field' => 'foo', 'Type' => 'thing']];
+        $resultingColumnQuery = 'resultingQuery';
+
         $queryString = sprintf(MySqlMap::APPLY_PATCH, $allSet);
 
         $query = $this->createQuery();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
+
+        $nameSpaces->expects($this->at(0))
+            ->method('getAppNameSpace')
+            ->willReturn('root_');
+        $nameSpaces->expects($this->at(1))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::SHOW_COLUMNS), $this->equalTo(false))
+            ->willReturn($resultingColumnQuery);
+        $nameSpaces->expects($this->at(2))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::APPLY_PATCH), $this->equalTo(false))
+            ->willReturn($queryString);
 
         $install->expects($this->once())
             ->method('dump')
             ->will($this->returnValue($fields));
 
         $query->expects($this->once())
+            ->method('read')
+            ->with($this->equalTo($resultingColumnQuery))
+            ->willReturn($columns);
+        $query->expects($this->once())
             ->method('write')
             ->with($this->equalTo($queryString), $this->equalTo($fields));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $map->applyInstall($install);
     }
@@ -82,20 +130,44 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         $bazSet = sprintf(MySqlMap::SET_VALUE, 'baz', 'baz');
         $allSet = $fooSet . ',' .  $barSet . ',' . $bazSet;
 
+        $columns = [
+            ['Field' => 'foo', 'Type' => 'thing'],
+            ['Field' => 'bar', 'Type' => 'thing'],
+            ['Field' => 'baz', 'Type' => 'thing']
+        ];
+        $resultingColumnQuery = 'resultingQuery';
+
         $queryString = sprintf(MySqlMap::APPLY_PATCH, $allSet);
 
         $query = $this->createQuery();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
+
+        $nameSpaces->expects($this->at(0))
+            ->method('getAppNameSpace')
+            ->willReturn('root_');
+        $nameSpaces->expects($this->at(1))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::SHOW_COLUMNS), $this->equalTo(false))
+            ->willReturn($resultingColumnQuery);
+        $nameSpaces->expects($this->at(2))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::APPLY_PATCH), $this->equalTo(false))
+            ->willReturn($queryString);
 
         $install->expects($this->once())
             ->method('dump')
             ->will($this->returnValue($fields));
 
         $query->expects($this->once())
+            ->method('read')
+            ->with($this->equalTo($resultingColumnQuery))
+            ->willReturn($columns);
+        $query->expects($this->once())
             ->method('write')
             ->with($this->equalTo($queryString), $this->equalTo($fields));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $map->applyInstall($install);
     }
@@ -126,11 +198,31 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         $idSet = sprintf(MySqlMap::SET_VALUE, 'id', 'id');
         $allSet = $barSet . ',' .  $booSet . ',' . $idSet;
 
+        $columns = [
+            ['Field' => 'bar', 'Type' => 'thing'],
+            ['Field' => 'boo', 'Type' => 'thing'],
+            ['Field' => 'id', 'Type' => 'thing']
+        ];
+        $resultingColumnQuery = 'resultingQuery';
+
         $queryString = sprintf(MySqlMap::UPDATE_PATCH, $allSet);
 
         $query = $this->createQuery();
         $originalInstall = $this->createInstall();
         $newInstall = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
+
+        $nameSpaces->expects($this->at(0))
+            ->method('getAppNameSpace')
+            ->willReturn('root_');
+        $nameSpaces->expects($this->at(1))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::SHOW_COLUMNS), $this->equalTo(false))
+            ->willReturn($resultingColumnQuery);
+        $nameSpaces->expects($this->at(2))
+            ->method('addNameSpaceToQuery')
+            ->with($this->equalTo(MySqlMap::UPDATE_PATCH), $this->equalTo(false))
+            ->willReturn($queryString);
 
         $originalInstall->expects($this->once())
             ->method('dump')
@@ -140,10 +232,14 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($newFields));
 
         $query->expects($this->once())
+            ->method('read')
+            ->with($this->equalTo($resultingColumnQuery))
+            ->willReturn($columns);
+        $query->expects($this->once())
             ->method('write')
             ->with($this->equalTo($queryString), $this->equalTo($diffFields));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $map->updateInstall($originalInstall, $newInstall);
     }
@@ -154,13 +250,14 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         $queryString = sprintf(MySqlMap::SELECT_PATCHES_TABLE, $table);
 
         $query = $this->createQuery();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $query->expects($this->once())
             ->method('read')
             ->with($this->equalTo($queryString), $this->equalTo(['table' => $table]))
             ->will($this->returnValue([]));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $this->assertEquals(['table' => $table, 'install' => ''], $map->getInstall($table));
     }
@@ -173,6 +270,7 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         $queryShowTable = sprintf(MySqlMap::SHOW_CREATE_TABLE, $table);
 
         $query = $this->createQuery();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $query->expects($this->at(0))
             ->method('read')
@@ -183,7 +281,7 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($queryShowTable), $this->equalTo([]))
             ->will($this->returnValue(''));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $this->assertEquals($results, $map->getInstall($table));
     }
@@ -212,6 +310,7 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
         $queryShowTable = sprintf(MySqlMap::SHOW_CREATE_TABLE, $table);
 
         $query = $this->createQuery();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $query->expects($this->at(0))
             ->method('read')
@@ -222,7 +321,7 @@ class MySqlMapTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($queryShowTable), $this->equalTo([]))
             ->will($this->returnValue([['Create Table' => $installSQL]]));
 
-        $map = new MySqlMap($query);
+        $map = new MySqlMap($query, $nameSpaces);
 
         $this->assertEquals($results, $map->getInstall($table));
     }

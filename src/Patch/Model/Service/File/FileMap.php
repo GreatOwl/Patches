@@ -4,15 +4,19 @@ namespace TallTree\Roots\Patch\Model\Service\File;
 use League\Flysystem\Filesystem;
 use TallTree\Roots\Patch\Model\Service\Map;
 use TallTree\Roots\Patch\Model\Patch;
+use TallTree\Roots\Service\Transform\NameSpaces;
 
 class FileMap implements Map
 {
     private $filesystem;
     private $dbDir;
+    private $transformer;
+    private $dbOnlyFields = ['nameSpace'];
 
-    public function __construct(Filesystem $filesystem, $dbDir)
+    public function __construct(Filesystem $filesystem, NameSpaces $transformer, $dbDir)
     {
         $this->filesystem = $filesystem;
+        $this->transformer = $transformer;
         $this->dbDir = $dbDir;
     }
 
@@ -23,6 +27,9 @@ class FileMap implements Map
             $this->fixKeys($patch);
             $patch['patch'] = $key;
             $patch['table'] = $table;
+            $patch['query'] = $this->transformer->removeNameSpaceFromQuery($patch['query']);
+            $patch['rollback'] = $this->transformer->removeNameSpaceFromQuery($patch['rollback']);
+            $patch['nameSpace'] = $this->transformer->getAppNameSpace();
         }
         return $patches;
     }
@@ -33,6 +40,7 @@ class FileMap implements Map
         $tablePatch = $patch->getPatch();
         list($patches, $filepath) = $this->loadPatches($table);
         $patches[$tablePatch] = $patch->dump();
+        $patches = $this->removeDbOnlyFields($patches);
         $encoded = json_encode($patches, JSON_PRETTY_PRINT);
         $this->filesystem->delete($filepath);
         $this->filesystem->write($filepath, $encoded);
@@ -48,6 +56,7 @@ class FileMap implements Map
         $currentPatch = $patches[$tablePatch];
         $mergedPatches = array_merge($currentPatch, $fields);
         $patches[$tablePatch] = $mergedPatches;
+        $patches = $this->removeDbOnlyFields($patches);
         $encoded = json_encode($patches, JSON_PRETTY_PRINT);
         $this->filesystem->delete($filepath);
         $this->filesystem->write($filepath, $encoded);
@@ -59,6 +68,17 @@ class FileMap implements Map
         $patches = json_decode($this->filesystem->read($filepath), true);
 
         return [$patches, $filepath];
+    }
+
+    private function removeDbOnlyFields($patches = [])
+    {
+        foreach ($patches as &$patch) {
+            foreach ($this->dbOnlyFields as $field) {
+                unset($patch[$field]);
+            }
+        }
+
+        return $patches;
     }
 
     private function fixKeys($params)

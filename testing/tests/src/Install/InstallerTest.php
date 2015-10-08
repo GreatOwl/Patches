@@ -68,6 +68,14 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         return $collection;
     }
 
+    private function createNameSpacesTransform()
+    {
+        $nameSpaces = $this->getMockBuilder('TallTree\Roots\Service\Transform\NameSpaces')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $nameSpaces;
+    }
+
     public function testInstallTableInstalled()
     {
         $table = 'someTable';
@@ -79,6 +87,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $factory = $this->createFactory();
         $installed = $this->createInstall();
         $unInstalled = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $repository->expects($this->once())
             ->method('buildInstallFromDatabase')
@@ -102,7 +111,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->installTable($table);
@@ -119,6 +129,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $factory = $this->createFactory();
         $installed = $this->createInstall();
         $unInstalled = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $repository->expects($this->once())
             ->method('buildInstallFromDatabase')
@@ -142,7 +153,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->installTable($table);
@@ -159,6 +171,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $factory = $this->createFactory();
         $installed = $this->createInstall();
         $unInstalled = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
         $installScript = 'stuff';
 
         $repository->expects($this->once())
@@ -188,7 +201,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->installTable($table);
@@ -205,6 +219,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $factory = $this->createFactory();
         $installed = $this->createInstall();
         $unInstalled = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
         $installScript = 'stuff';
 
         $repository->expects($this->once())
@@ -241,7 +256,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->installTable($table);
@@ -255,6 +271,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $dbMap = $this->createMap();
         $fileMap = $this->createMap();
         $factory = $this->createFactory();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $fileHandle->expects($this->once())
             ->method('getAllFilesInDir')
@@ -267,7 +284,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->installAll();
@@ -285,6 +303,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $factory = $this->createFactory();
         $installed = $this->createInstall();
         $unInstalled = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
         $installScript = 'stuff';
 
         $fileHandle->expects($this->once())
@@ -326,7 +345,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->installAll();
@@ -348,6 +368,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $patchCount = -1;
         $originalInstall = $this->createInstall();
         $patched = $this->createPatchCollection();
+        $nameSpaces = $this->createNameSpacesTransform();
         $installScript = 'stuff';
 
         $installer = new Installer(
@@ -356,7 +377,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->updateInstallScripts($originalInstall, $patched, $patchCount);
@@ -379,6 +401,7 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
         $newInstall = $this->createInstall();
         $patched = $this->createPatchCollection();
         $postPatchInstall = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
         $patchId = 4;
         $installScript = 'install stuff';
 
@@ -420,7 +443,8 @@ class InstallerTest extends \PHPUnit_Framework_TestCase
             $fileHandle,
             $dbMap,
             $fileMap,
-            $factory
+            $factory,
+            $nameSpaces
         );
 
         $installer->updateInstallScripts($originalInstall, $patched, $patchCount);

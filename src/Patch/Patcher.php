@@ -9,6 +9,7 @@ use TallTree\Roots\Service\Database\Query;
 use TallTree\Roots\Service\File\Handle;
 use TallTree\Roots\Install\Repository as InstallRepository;
 use TallTree\Roots\Install\Model\Service\Map as InstallMap;
+use TallTree\Roots\Service\Transform\NameSpaces;
 
 class Patcher
 {
@@ -21,6 +22,7 @@ class Patcher
     private $dbMap;
     private $fileMap;
     private $installer;
+    private $transformer;
 
     public function __construct(
         Repository $repository,
@@ -30,7 +32,8 @@ class Patcher
         Map $dbMap,
         Map $fileMap,
         InstallRepository $installRepository,
-        Installer $installer
+        Installer $installer,
+        NameSpaces $transformer
     ) {
         $this->repository = $repository;
         $this->installRepository = $installRepository;
@@ -39,7 +42,8 @@ class Patcher
         $this->fileHandle = $fileHandle;
         $this->dbMap = $dbMap;
         $this->fileMap = $fileMap;
-        $this->installer= $installer;
+        $this->installer = $installer;
+        $this->transformer = $transformer;
     }
 
     public function patchTable($table)
@@ -56,7 +60,8 @@ class Patcher
 
         /** @var Patch $patch */
         foreach ($unmatchedAfterInstall as $patch) {
-            $error = $this->query->patch($patch->getQuery());
+            $query = $this->transformer->addNameSpaceToQuery($patch->getQuery());
+            $error = $this->query->patch($query);
             if (is_null($error[2])) {
                 $this->dbMap->applyPatch($patch);
                 $this->fileMap->applyPatch($patch);
