@@ -23,9 +23,18 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         return $patch;
     }
 
+    private function createNameSpacesTransform()
+    {
+        $nameSpaces = $this->getMockBuilder('TallTree\Roots\Service\Transform\NameSpaces')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $nameSpaces;
+    }
+
     public function testGetPatches()
     {
         $fileSystem = $this->createFileSystem();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $dbDir = 'some/dir/';
         $tableName = 'someTable';
@@ -34,24 +43,24 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $expectedPatches = [
             [
                 'query' => 'some query',
-                'rollBack' => 'the anti query'
+                'rollback' => 'the anti query'
             ],
             [
                 'query' => 'another query',
-                'rollBack' => 'query of undoing'
+                'rollback' => 'query of undoing'
             ]
         ];
 
         $expectedReturnPatches = [
             [
                 'query' => 'some query',
-                'rollBack' => 'the anti query',
+                'rollback' => 'the anti query',
                 'patch' => 0,
                 'table' => 'someTable'
             ],
             [
                 'query' => 'another query',
-                'rollBack' => 'query of undoing',
+                'rollback' => 'query of undoing',
                 'patch' => 1,
                 'table' => 'someTable'
             ]
@@ -62,7 +71,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($filePath))
             ->will($this->returnValue(json_encode($expectedPatches)));
 
-        $fileMap = new FileMap($fileSystem, $dbDir);
+        $fileMap = new FileMap($fileSystem, $nameSpaces, $dbDir);
 
         $this->assertEquals($expectedReturnPatches, $fileMap->getPatches($tableName));
     }
@@ -71,6 +80,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     {
         $fileSystem = $this->createFileSystem();
         $patch = $this->createPatch();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $dbDir = 'some/dir/';
         $tableName = 'someTable';
@@ -122,7 +132,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
             ->method('write')
             ->with($this->equalTo($filePath), $this->equalTo(json_encode($expectedReturnPatches, JSON_PRETTY_PRINT)));
 
-        $fileMap = new FileMap($fileSystem, $dbDir);
+        $fileMap = new FileMap($fileSystem, $nameSpaces, $dbDir);
 
         $fileMap->applyPatch($patch);
     }
@@ -132,6 +142,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $fileSystem = $this->createFileSystem();
         $originalPatch = $this->createPatch();
         $newPatch = $this->createPatch();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $dbDir = 'some/dir/';
         $tableName = 'someTable';
@@ -195,7 +206,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
             ->method('write')
             ->with($this->equalTo($filePath), $this->equalTo(json_encode($expectedReturnPatches, JSON_PRETTY_PRINT)));
 
-        $fileMap = new FileMap($fileSystem, $dbDir);
+        $fileMap = new FileMap($fileSystem, $nameSpaces, $dbDir);
 
         $fileMap->updatePatch($originalPatch, $newPatch);
     }

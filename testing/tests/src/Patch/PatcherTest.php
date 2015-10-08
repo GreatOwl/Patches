@@ -84,6 +84,14 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         return $install;
     }
 
+    private function createNameSpacesTransform()
+    {
+        $nameSpaces = $this->getMockBuilder('TallTree\Roots\Service\Transform\NameSpaces')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $nameSpaces;
+    }
+
     private function createCallable() {
         return function() {
 
@@ -101,6 +109,7 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         $installRepository = $this->createInstallRepository();
         $installer = $this->createInstaller();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $table = 'someTable';
         $queryString = 'someQuery';
@@ -172,7 +181,8 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             $dbMap,
             $fileMap,
             $installRepository,
-            $installer
+            $installer,
+            $nameSpaces
         );
 
         $controller->patchTable($table);
@@ -189,6 +199,7 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         $installRepository = $this->createInstallRepository();
         $installer = $this->createInstaller();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $table = 'someTable';
         $queryString = 'someQuery';
@@ -267,7 +278,8 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             $dbMap,
             $fileMap,
             $installRepository,
-            $installer
+            $installer,
+            $nameSpaces
         );;
 
         $controller->patchTable($table);
@@ -284,6 +296,7 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
         $installRepository = $this->createInstallRepository();
         $installer = $this->createInstaller();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $table = 'someTable';
         $queryString = 'someQuery';
@@ -366,7 +379,8 @@ class PatcherTest extends \PHPUnit_Framework_TestCase
             $dbMap,
             $fileMap,
             $installRepository,
-            $installer
+            $installer,
+            $nameSpaces
         );
 
         $controller->patchAll();

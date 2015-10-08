@@ -21,6 +21,14 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         return $install;
     }
 
+    private function createNameSpacesTransform()
+    {
+        $nameSpaces = $this->getMockBuilder('TallTree\Roots\Service\Transform\NameSpaces')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $nameSpaces;
+    }
+
     public function testGetInstall()
     {
         $table = 'table';
@@ -29,13 +37,14 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $expected = ['table' => $table];
 
         $fileSystem = $this->createFileSystem();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $fileSystem->expects($this->once())
             ->method('read')
             ->with($this->equalTo($expectedFilePath))
             ->willReturn(json_encode($expected, JSON_PRETTY_PRINT));
 
-        $fileMap = new FileMap($fileSystem, $dbDir);
+        $fileMap = new FileMap($fileSystem, $nameSpaces, $dbDir);
 
         $this->assertEquals($expected, $fileMap->getInstall($table));
     }
@@ -52,6 +61,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
 
         $fileSystem = $this->createFileSystem();
         $install = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $install->expects($this->once())
             ->method('getTable')
@@ -67,7 +77,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
             ->method('write')
             ->with($this->equalTo($expectedFilePath), json_encode($expected, JSON_PRETTY_PRINT));
 
-        $fileMap = new FileMap($fileSystem, $dbDir);
+        $fileMap = new FileMap($fileSystem, $nameSpaces, $dbDir);
 
         $fileMap->applyInstall($install);
     }
@@ -85,6 +95,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $fileSystem = $this->createFileSystem();
         $originalInstall = $this->createInstall();
         $newInstall = $this->createInstall();
+        $nameSpaces = $this->createNameSpacesTransform();
 
         $originalInstall->expects($this->once())
             ->method('getTable')
@@ -100,7 +111,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
             ->method('write')
             ->with($this->equalTo($expectedFilePath), json_encode($expected, JSON_PRETTY_PRINT));
 
-        $fileMap = new FileMap($fileSystem, $dbDir);
+        $fileMap = new FileMap($fileSystem, $nameSpaces, $dbDir);
 
         $fileMap->updateInstall($originalInstall, $newInstall);
     }
